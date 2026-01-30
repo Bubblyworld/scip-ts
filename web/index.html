@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>scip-ts examples</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>scip-ts examples</h1>
+
+    <div class="controls">
+      <select id="example-select" data-testid="example-select">
+        <option value="">Select an example...</option>
+      </select>
+      <button id="run-button" data-testid="run-button" disabled>Run</button>
+    </div>
+
+    <div class="panels">
+      <div class="panel">
+        <h2>Problem (LP format)</h2>
+        <pre id="problem-display" data-testid="problem-display"></pre>
+      </div>
+
+      <div class="panel">
+        <h2>Results</h2>
+        <div id="results-panel" data-testid="results-panel">
+          <div class="result-row">
+            <span class="label">Status:</span>
+            <span id="result-status" data-testid="result-status">-</span>
+          </div>
+          <div class="result-row">
+            <span class="label">Objective:</span>
+            <span id="result-objective" data-testid="result-objective">-</span>
+          </div>
+          <div class="result-row">
+            <span class="label">Solution:</span>
+            <pre id="result-solution" data-testid="result-solution">-</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="console-section">
+      <h2>Console Output</h2>
+      <pre id="console-output" data-testid="console-output"></pre>
+    </div>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -22,7 +22,10 @@
     "build": "npm run build:wasm && npm run build:ts",
     "build:wasm": "cd build && ./build.sh",
     "build:ts": "tsc && rollup -c",
-    "test": "vitest run",
+    "serve": "node --import tsx web/server.ts",
+    "test": "npm run test:node && npm run test:browser",
+    "test:node": "vitest run",
+    "test:browser": "playwright test --config test/playwright.config.ts",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
@@ -38,9 +41,11 @@
   "author": "Guy Paterson-Jones",
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.40.0",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^20.0.0",
     "rollup": "^4.0.0",
+    "tsx": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
   }
