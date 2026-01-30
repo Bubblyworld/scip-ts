@@ -6,13 +6,11 @@ export async function loadSCIPModule(
 ): Promise<EmscriptenModule> {
   const createModule = await loadSCIPFactory();
 
-  const moduleOptions: Record<string, unknown> = {};
-  if (options?.console?.log !== undefined) {
-    moduleOptions.print = options.console.log ?? (() => {});
-  }
-  if (options?.console?.error !== undefined) {
-    moduleOptions.printErr = options.console.error ?? (() => {});
-  }
+  const consoleConfig = options?.console ?? { log: null, error: null };
+  const moduleOptions: Record<string, unknown> = {
+    print: consoleConfig.log ?? (() => {}),
+    printErr: consoleConfig.error ?? (() => {}),
+  };
 
   return createModule(moduleOptions);
 }

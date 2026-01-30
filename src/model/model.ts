@@ -68,10 +68,10 @@ export class Model {
     });
   }
 
-  /** Solves the model and returns the solution. Console output is suppressed by default. */
+  /** Solves the model and returns the solution. */
   async solve(options?: SCIPOptions): Promise<Solution> {
     const lpString = this.toLPFormat();
-    const scip = await BaseSCIP.create(options ?? { console: { log: null, error: null } });
+    const scip = await BaseSCIP.create(options);
     try {
       await scip.readProblemFromString(lpString, 'lp');
       const result = await scip.solve();
