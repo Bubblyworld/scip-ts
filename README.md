@@ -1,13 +1,13 @@
 # scip-ts
 
-WASM build of the [SCIP](https://scipopt.org) and [HiGHS](https://highs.dev) solvers with TypeScript bindings. Supports linear and mixed-integer linear programming, and runs in both node and browser environments with zero runtime dependencies. Note that the wasm module is ~8mb, so you may want to consider lazy-loading it from a CDN in your app instead of bundling it directly.
+[WASM](https://webassembly.org/) build of the [SCIP](https://scipopt.org) and [HiGHS](https://highs.dev) solvers with TypeScript bindings. Supports linear and mixed-integer linear programming, and runs in both node and browser environments with zero runtime dependencies. Note that the WASM module is ~8mb, so you may want to consider lazy-loading it instead of bundling it into your app.
 
 ## Basic Usage
 
-The `SCIP` class provides direct access to the solver. Problems can be loaded from strings in LP or MPS format.
+The `SCIP` class provides direct access to the solver. Problems can be loaded from strings in [CPLEX LP](https://www.ibm.com/docs/en/icos/22.1.0?topic=cplex-lp-file-format-algebraic-representation) or [MPS](https://en.wikipedia.org/wiki/MPS_(format)) format.
 
 ```typescript
-import { SCIP } from 'scip-ts';
+import { SCIP } from '@bubblyworld/scip-ts';
 
 const lp = `
 Maximize
@@ -37,7 +37,7 @@ scip.free();
 The `Model` class provides a builder interface for defining problems programmatically.
 
 ```typescript
-import { Model, sum } from 'scip-ts';
+import { Model, sum } from '@bubblyworld/scip-ts';
 
 const model = new Model();
 
@@ -129,3 +129,7 @@ Start the development server, which allows you to solve the linear programs in `
 ```bash
 npm run serve
 ```
+
+## Acknowledgements
+
+Obviously almost all the credit here goes to the authors of the SCIP and HiGHS solvers, which are pretty remarkable pieces of software. I've just packaged it nicely for use in the javascript world. Personally I think constraint solvers are high magic, and us programmers should really be using them more often as a primitive. If your optimisation problem is amenable to it, I've found that formulating a solution as a linear program is much more flexible than coding a solution directly (via dynamic programming, for instance). Small changes in requirements usually lead to small changes in the linear program - it's very maintainable in that sense. By contrast, almost any change in requirements for a dynamic programming algorithm requires rethinking the whole thing. Give it a try!
