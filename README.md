@@ -80,7 +80,7 @@ model.maximize(
 );
 
 const solution = await model.solve();
-// solution.objective = 50
+console.log(solution.objective); // 50
 ```
 
 ## Configuration
@@ -124,7 +124,7 @@ npm run test:node    # Node only
 npm run test:browser # Browser only (using Playwright)
 ```
 
-Start the development server, which allows you to solve the linear programs in `examples/` in your browser and inspect the output:
+Start the development server:
 
 ```bash
 npm run serve
