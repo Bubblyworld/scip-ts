@@ -1,5 +1,9 @@
 # scip-ts
 
+[![npm version](https://img.shields.io/npm/v/@bubblyworld/scip-ts)](https://www.npmjs.com/package/@bubblyworld/scip-ts)
+[![CI](https://github.com/Bubblyworld/scip-ts/actions/workflows/ci.yml/badge.svg)](https://github.com/Bubblyworld/scip-ts/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 [WASM](https://webassembly.org/) build of the [SCIP](https://scipopt.org) and [HiGHS](https://highs.dev) solvers with TypeScript bindings. Supports linear and mixed-integer linear programming, and runs in both node and browser environments with zero runtime dependencies. Note that the WASM module is ~8mb, so you may want to consider lazy-loading it instead of bundling it into your app.
 
 ## Basic Usage
@@ -129,6 +133,15 @@ Start the development server:
 ```bash
 npm run serve
 ```
+
+## Licensing
+
+This package is licensed under the Apache 2.0 License. The WASM bundle includes:
+
+- **SCIP** - Licensed under Apache 2.0 by Zuse Institute Berlin ([license](https://github.com/scipopt/scip/blob/master/LICENSE))
+- **HiGHS** - Licensed under MIT by the HiGHS team ([license](https://github.com/ERGO-Code/HiGHS/blob/master/LICENSE))
+
+Both licenses are permissive and allow commercial use, modification, and distribution.
 
 ## Acknowledgements
 

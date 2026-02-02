@@ -42,7 +42,7 @@
     "milp"
   ],
   "author": "Guy Paterson-Jones",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Bubblyworld/scip-ts.git"
