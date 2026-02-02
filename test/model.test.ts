@@ -173,7 +173,7 @@ describe('Model', () => {
 
   });
 
-  describe('toLPFormat', () => {
+  describe('print', () => {
     it('should generate valid LP format', () => {
       const model = new Model();
       const x = model.numVar(0, 10, 'x');
@@ -182,7 +182,7 @@ describe('Model', () => {
       model.addConstraint(x.plus(y).leq(10), 'c1');
       model.maximize(x.plus(y.times(2)));
 
-      const lp = model.toLPFormat();
+      const lp = model.print();
 
       expect(lp).toContain('Maximize');
       expect(lp).toContain('obj:');
@@ -199,7 +199,7 @@ describe('Model', () => {
       model.addConstraint(x.leq(5));
       model.maximize(x);
 
-      const lp = model.toLPFormat();
+      const lp = model.print();
 
       expect(lp).toContain('General');
       expect(lp).toContain('x');
@@ -212,10 +212,57 @@ describe('Model', () => {
       model.addConstraint(x.leq(1));
       model.maximize(x);
 
-      const lp = model.toLPFormat();
+      const lp = model.print();
 
       expect(lp).toContain('Binary');
       expect(lp).toContain('x');
+    });
+
+    it('should generate valid MPS format', () => {
+      const model = new Model();
+      const x = model.numVar(0, 10, 'x');
+      const y = model.numVar(0, 10, 'y');
+
+      model.addConstraint(x.plus(y).leq(10), 'c1');
+      model.maximize(x.plus(y.times(2)));
+
+      const mps = model.print('mps');
+
+      expect(mps).toContain('NAME');
+      expect(mps).toContain('OBJSENSE');
+      expect(mps).toContain('MAX');
+      expect(mps).toContain('ROWS');
+      expect(mps).toContain('N  obj');
+      expect(mps).toContain('L  c1');
+      expect(mps).toContain('COLUMNS');
+      expect(mps).toContain('RHS');
+      expect(mps).toContain('BOUNDS');
+      expect(mps).toContain('ENDATA');
+    });
+
+    it('should include integer markers in MPS format', () => {
+      const model = new Model();
+      const x = model.intVar(0, 10, 'x');
+
+      model.addConstraint(x.leq(5));
+      model.maximize(x);
+
+      const mps = model.print('mps');
+
+      expect(mps).toContain("'INTORG'");
+      expect(mps).toContain("'INTEND'");
+    });
+
+    it('should mark binary variables in MPS format', () => {
+      const model = new Model();
+      const x = model.boolVar('x');
+
+      model.addConstraint(x.leq(1));
+      model.maximize(x);
+
+      const mps = model.print('mps');
+
+      expect(mps).toContain('BV bnd  x');
     });
   });
 
@@ -242,7 +289,7 @@ describe('Model', () => {
       model.addConstraint(x.leq(5));
       model.addConstraint(x.geq(0));
 
-      const lp = model.toLPFormat();
+      const lp = model.print();
 
       expect(lp).toContain('c0:');
       expect(lp).toContain('c1:');
@@ -282,11 +329,36 @@ describe('Model', () => {
       model.addConstraint(x.leq(5), 'c2');
       model.maximize(x.plus(y.times(2)));
 
-      const lp = model.toLPFormat();
+      const lp = model.print();
 
       const scip = await SCIP.create({ console: { log: null, error: null } });
       try {
-        await scip.readProblemFromString(lp, 'lp');
+        await scip.parse(lp, 'lp');
+        const result = await scip.solve();
+
+        expect(result.status).toBe('optimal');
+        expect(result.objective).toBeCloseTo(20, 5);
+      } finally {
+        scip.free();
+      }
+    });
+
+    it('generated MPS should be readable by low-level API', async () => {
+      const { SCIP } = await import('../src/index.node.js');
+
+      const model = new Model();
+      const x = model.numVar(0, 10, 'x');
+      const y = model.numVar(0, 10, 'y');
+
+      model.addConstraint(x.plus(y).leq(10), 'c1');
+      model.addConstraint(x.leq(5), 'c2');
+      model.maximize(x.plus(y.times(2)));
+
+      const mps = model.print('mps');
+
+      const scip = await SCIP.create({ console: { log: null, error: null } });
+      try {
+        await scip.parse(mps, 'mps');
         const result = await scip.solve();
 
         expect(result.status).toBe('optimal');

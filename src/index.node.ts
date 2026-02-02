@@ -11,7 +11,7 @@ export {
   Solution,
   sum,
 } from './model/index.js';
-export type { VarType, Sense, Term } from './model/index.js';
+export type { VarType, Sense, Term, ModelFormat } from './model/index.js';
 
 /** SCIP solver with Node.js-specific file reading support. */
 export class SCIP extends BaseSCIP {
@@ -19,7 +19,7 @@ export class SCIP extends BaseSCIP {
   async readProblem(path: string): Promise<void> {
     const content = readFileSync(path, 'utf-8');
     const ext = path.split('.').pop() || 'lp';
-    await this.readProblemFromString(content, ext);
+    await this.parse(content, ext);
   }
 
   static override async create(options?: SCIPOptions): Promise<SCIP> {
