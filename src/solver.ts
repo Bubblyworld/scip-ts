@@ -76,6 +76,37 @@ export class SCIP {
     }
   }
 
+  /** Sets a SCIP parameter by name. Supports boolean, integer, real, and string values. */
+  setParam(name: string, value: boolean | number | string): void {
+    this.ensureNotFreed();
+
+    if (typeof value === 'boolean') {
+      this.module.ccall(
+        'SCIPsetBoolParam', 'number',
+        ['number', 'string', 'number'],
+        [this.scipPtr, name, value ? 1 : 0],
+      );
+    } else if (typeof value === 'string') {
+      this.module.ccall(
+        'SCIPsetStringParam', 'number',
+        ['number', 'string', 'string'],
+        [this.scipPtr, name, value],
+      );
+    } else if (Number.isInteger(value)) {
+      this.module.ccall(
+        'SCIPsetIntParam', 'number',
+        ['number', 'string', 'number'],
+        [this.scipPtr, name, value],
+      );
+    } else {
+      this.module.ccall(
+        'SCIPsetRealParam', 'number',
+        ['number', 'string', 'number'],
+        [this.scipPtr, name, value],
+      );
+    }
+  }
+
   /** Solves the loaded problem and returns the result. */
   async solve(): Promise<SolveResult> {
     this.ensureNotFreed();
@@ -163,15 +194,23 @@ export class SCIP {
       return;
     }
 
+    this.freed = true;
+
     const scipPtrPtr = this.module._malloc(4);
     try {
       this.module.setValue(scipPtrPtr, this.scipPtr, 'i32');
       this.module.ccall('SCIPfree', 'number', ['number'], [scipPtrPtr]);
+    } catch {
+      // SCIPfree can trigger WASM memory access errors in browser environments
+      // during deep recursive deallocation. Since each SCIP instance owns its
+      // own Emscripten module, the memory will be reclaimed by GC regardless.
     } finally {
-      this.module._free(scipPtrPtr);
+      try {
+        this.module._free(scipPtrPtr);
+      } catch {
+        // Same as above — _free may fail if the WASM state is already corrupted.
+      }
     }
-
-    this.freed = true;
   }
 
   private ensureNotFreed(): void {

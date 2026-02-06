@@ -35,8 +35,10 @@ echo "Working in temporary directory: $TEMP_DIR"
 cd "$TEMP_DIR"
 TEMP_DIR=$(pwd -P)
 
-echo "Cloning SCIP..."
-git clone --depth 1 https://github.com/scipopt/scip.git
+SCIP_VERSION="v10.0.1"
+
+echo "Cloning SCIP ${SCIP_VERSION}..."
+git clone --depth 1 --branch "${SCIP_VERSION}" https://github.com/scipopt/scip.git
 cd scip
 SCIP_DIR=$(pwd -P)
 
@@ -112,25 +114,27 @@ echo "Building SCIP for WASM..."
 mkdir -p build-wasm
 cd build-wasm
 
-EXPORTED_FUNCTIONS="_SCIPcreate,_SCIPfree,_SCIPincludeDefaultPlugins,_SCIPreadProb,_SCIPsolve,_SCIPgetStatus,_SCIPgetBestSol,_SCIPgetSolVal,_SCIPgetSolOrigObj,_SCIPgetNVars,_SCIPgetVars,_SCIPgetNOrigVars,_SCIPgetOrigVars,_SCIPvarGetName,_malloc,_free,_main"
+EXPORTED_FUNCTIONS="_SCIPcreate,_SCIPfree,_SCIPincludeDefaultPlugins,_SCIPreadProb,_SCIPsolve,_SCIPgetStatus,_SCIPgetBestSol,_SCIPgetSolVal,_SCIPgetSolOrigObj,_SCIPgetNVars,_SCIPgetVars,_SCIPgetNOrigVars,_SCIPgetOrigVars,_SCIPvarGetName,_SCIPsetIntParam,_SCIPsetRealParam,_SCIPsetLongintParam,_SCIPsetCharParam,_SCIPsetBoolParam,_SCIPsetStringParam,_malloc,_free,_main"
 EXPORTED_RUNTIME_METHODS="ccall,cwrap,getValue,setValue,UTF8ToString,stringToUTF8,FS,HEAP8,HEAPU8,HEAP32"
 
-EMSCRIPTEN_FLAGS="-sEXPORTED_FUNCTIONS=${EXPORTED_FUNCTIONS} \
+EMSCRIPTEN_FLAGS="-O1 \
+-sEXPORTED_FUNCTIONS=${EXPORTED_FUNCTIONS} \
 -sEXPORTED_RUNTIME_METHODS=${EXPORTED_RUNTIME_METHODS} \
 -sMODULARIZE=1 \
 -sEXPORT_NAME=createSCIPModule \
 -sEXPORT_ES6=1 \
 -sENVIRONMENT=web,node \
 -sALLOW_MEMORY_GROWTH=1 \
--sSTACK_SIZE=4194304 \
+-sSTACK_SIZE=16777216 \
 -sINVOKE_RUN=0 \
--fexceptions"
+-sDISABLE_EXCEPTION_CATCHING=1"
 
 emcmake cmake .. \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_FLAGS="-DSCIP_NO_SIGACTION" \
-    -DCMAKE_CXX_FLAGS="-DSCIP_NO_SIGACTION -fexceptions" \
+    -DCMAKE_CXX_FLAGS="-DSCIP_NO_SIGACTION" \
     -DCMAKE_EXE_LINKER_FLAGS="${EMSCRIPTEN_FLAGS}" \
+    -DCMAKE_EXE_LINKER_FLAGS_RELEASE="" \
     -DCMAKE_MODULE_PATH="$(pwd)/../cmake-modules" \
     -DLPS=highs \
     -DHIGHS_DIR="$(pwd)/../build-highs-wasm" \

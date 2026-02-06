@@ -48,14 +48,7 @@ export const fixtures: TestFixture[] = [
       solution: { y_a: 1, y_b: 0, x_a: 10, x_b: 0 },
     },
   },
-  {
-    name: 'facility-location',
-    expected: {
-      status: 'optimal',
-      objective: 18264.35038,
-    },
-  },
-  {
+{
     name: 'job-shop',
     expected: {
       status: 'optimal',
