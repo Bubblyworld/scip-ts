@@ -6,6 +6,8 @@
 
 [WASM](https://webassembly.org/) build of the [SCIP](https://scipopt.org) and [HiGHS](https://highs.dev) solvers with TypeScript bindings. Supports linear and mixed-integer linear programming, and runs in both node and browser environments with zero runtime dependencies. Note that the WASM module is ~8mb, so you may want to consider lazy-loading it instead of bundling it into your app.
 
+Several recursive heuristics have been disabled in the browser version as they overwhelm the browser's stack very quickly on non-trivial problem instances. For details see [`src/index.browser.ts`](src/index.browser.ts).
+
 ## Basic Usage
 
 The `SCIP` class provides direct access to the solver. Problems can be loaded from strings in [CPLEX LP](https://www.ibm.com/docs/en/icos/22.1.0?topic=cplex-lp-file-format-algebraic-representation) or [MPS](https://en.wikipedia.org/wiki/MPS_(format)) format.
@@ -145,8 +147,4 @@ Both licenses are permissive and allow commercial use, modification, and distrib
 
 ## Acknowledgements
 
-Obviously almost all of the credit here goes to the authors of the SCIP and HiGHS solvers, which are pretty remarkable pieces of software. I've just packaged them nicely for use in the javascript world. Personally I think constraint solvers are high magic, and we should be trying to use them more often as a primitive. Most programmers don't even seem to know that they exist! If your optimisation problem is amenable to it, I've found that formulating a solution as a linear program is much more flexible than coding a solution directly (via dynamic programming, for instance). Small changes in requirements usually lead to small changes in the linear program; it's very maintainable in that sense. By contrast, almost any change in requirements for a dynamic programming solution requires carefully rethinking the whole thing. Give it a try!
-
-## Use of AI Assistance
-
-As a sharp-eyed reader would have noticed from the CLAUDE.md file, I make use of AI assistance for maintaining this package. I think this is a good use-case for it - all of the technical challenges are solved by SCIP and HiGHS, and what remains is essentially just a plumbing exercise. There is also a rigid source of truth, in that we can test the output of the WASM module directly against the output of the native builds, something which is widely believed to be important for getting good results from coding agents (see Terence Tao's writing on [Mathstodon](https://mathstodon.xyz/@tao), for instance, or [Armin Ronacher's blog](https://lucumr.pocoo.org/)). If I uncover any bugs in the plumbing that I would consider attributable to AI (i.e. not written by me), I will write up the details here for posterity.
+The vast majority of the credit here goes to the authors of [SCIP](https://scipopt.org) and [HiGHS](https://highs.dev). I've just packaged them nicely for use in the javascript/typescript world.
