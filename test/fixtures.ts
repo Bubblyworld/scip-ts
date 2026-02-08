@@ -73,4 +73,44 @@ export const fixtures: TestFixture[] = [
       objective: 4,
     },
   },
+  {
+    name: 'knapsack',
+    expensive: true,
+    expected: {
+      status: 'optimal',
+      objective: 1667,
+    },
+  },
+  {
+    name: 'set-cover',
+    expensive: true,
+    expected: {
+      status: 'optimal',
+      objective: 181,
+    },
+  },
+  {
+    name: 'facility-location',
+    expensive: true,
+    expected: {
+      status: 'optimal',
+      objective: 1238,
+    },
+  },
+  {
+    name: 'capital-budgeting',
+    expensive: true,
+    expected: {
+      status: 'optimal',
+      objective: 3127,
+    },
+  },
+  {
+    name: 'nurse-scheduling',
+    expensive: true,
+    expected: {
+      status: 'optimal',
+      objective: 1188,
+    },
+  },
 ];

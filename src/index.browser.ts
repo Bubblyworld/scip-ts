@@ -17,7 +17,7 @@ export type { VarType, Sense, Term, ModelFormat } from './model/index.js';
  * These create recursive solver instances whose deep call stacks overflow
  * the browser's ~1MB native stack limit.
  */
-const BROWSER_DISABLED_HEURISTICS = [
+const BROWSER_DISABLED_HEURISTICS: string[] = [
   'rens', 'rins', 'crossover', 'mutation', 'localbranching',
   'dins', 'trustregion', 'alns', 'feaspump', 'undercover',
   'proximity', 'vbounds',
