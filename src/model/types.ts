@@ -11,3 +11,21 @@ export interface Term {
 }
 
 import type { Var } from './var.js';
+
+export interface XorOptions {
+  method?: 'constraints' | 'compact';
+}
+
+export interface IndicatorOptions {
+  active?: 0 | 1;
+  bigM?: number;
+}
+
+export interface BigMOptions {
+  bigM?: number;
+}
+
+export interface ReifyOptions {
+  bigM?: number;
+  epsilon?: number;
+}

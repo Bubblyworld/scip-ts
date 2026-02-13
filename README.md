@@ -87,6 +87,89 @@ const solution = await model.solve();
 console.log(solution.objective); // @expect: solution.objective === 50
 ```
 
+## Modelling Primitives
+
+The `Model` class includes a number of higher-level primitives for common MILP reformulations, built on top of the basic variable and constraint API. Logical operations (`and`, `or`, `not`, `xor`), cardinality constraints (`addAtMost`, `addAtLeast`, `addExactly`), indicators, `abs`, `max`, `min`, and `product` are all available — see the source for full details. The rest of this section covers some of the less obvious primitives.
+
+### Semi-Continuous Variables
+
+A semi-continuous variable is either exactly zero or lies within a range `[lb, ub]`, with no values in between. This is useful for modelling minimum-batch-size or on/off decisions where partial activation doesn't make sense.
+
+```typescript
+const model = new Model();
+const batch = model.semiContVar(100, 500, 'batch');
+
+model.maximize(batch);
+const solution = await model.solve();
+console.log(solution.objective); // @expect: solution.objective === 500
+```
+
+### Integer Division
+
+`divMod(expr, d)` returns quotient and remainder variables for dividing a non-negative integer expression by a positive integer constant.
+
+```typescript
+const model = new Model();
+const minutes = model.intVar(0, 1440, 'minutes');
+const { quotient, remainder } = model.divMod(minutes, 60);
+
+model.addConstraint(minutes.eq(145));
+model.minimize(quotient);
+
+const solution = await model.solve();
+console.log(solution.objective); // @expect: solution.objective === 2
+```
+
+### Either-Or Constraints
+
+`addEitherOr(c1, c2)` enforces that at least one of two constraints must hold, using indicator variables internally.
+
+```typescript
+const model = new Model();
+const x = model.numVar(0, 100, 'x');
+const y = model.numVar(0, 100, 'y');
+
+model.addEitherOr(x.leq(10), y.leq(10));
+model.maximize(x.plus(y));
+
+const solution = await model.solve();
+console.log(solution.objective); // @expect: solution.objective === 110
+```
+
+### Reification
+
+`reify(constraint)` returns a binary variable `delta` that is 1 if and only if the constraint is satisfied. This is the most general way to convert a constraint into a variable for use in other expressions. It supports `<=`, `>=`, and `=` senses.
+
+```typescript
+const model = new Model();
+const tasks = [
+  model.intVar(0, 10, 'a'),
+  model.intVar(0, 10, 'b'),
+  model.intVar(0, 10, 'c'),
+];
+
+const overloaded = tasks.map(t => model.reify(t.geq(8)));
+model.addConstraint(sum(...overloaded).leq(1));
+
+model.maximize(sum(...tasks));
+const solution = await model.solve();
+console.log(solution.objective); // @expect: solution.objective === 24
+```
+
+Epsilon defaults to 1 for purely-integer expressions (exact reification) and 1e-6 for continuous expressions. Both epsilon and Big-M can be overridden via options:
+
+```typescript
+const model = new Model();
+const x = model.numVar(0, 100, 'x');
+const delta = model.reify(x.leq(50), { bigM: 200, epsilon: 1e-4 });
+
+model.addConstraint(delta.eq(1));
+model.maximize(x);
+
+const solution = await model.solve();
+console.log(solution.objective); // @expect: solution.objective === 50
+```
+
 ## Configuration
 
 ### Console Output

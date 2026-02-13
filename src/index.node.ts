@@ -10,8 +10,13 @@ export {
   Constraint,
   Solution,
   sum,
+  exprBounds,
+  isIntegral,
 } from './model/index.js';
-export type { VarType, Sense, Term, ModelFormat } from './model/index.js';
+export type {
+  VarType, Sense, Term, ModelFormat,
+  XorOptions, IndicatorOptions, BigMOptions, ReifyOptions,
+} from './model/index.js';
 
 /** HiGHS solver with Node.js-specific file reading support. */
 export class HiGHS extends BaseHiGHS {
